@@ -1,13 +1,13 @@
 const { hello } = require("./handler");
 const wrapper = (event, context, callback) => {
   context.done = (err, res) => {
-    callback(err, res)
+    callback(err, res);
   };
   context.succeed = res => {
-    callback(null, res)
+    callback(null, res);
   };
   context.fail = err => {
-    callback(err)
+    callback(err);
   };
 
   let result;
@@ -16,17 +16,17 @@ const wrapper = (event, context, callback) => {
   } catch (err) {
     callback(err);
   }
-  if (result && typeof result.then === 'function') {
+  if (result && typeof result.then === "function") {
     result
       .then(realRes => {
         callback(null, realRes);
       })
       .catch(err => {
         callback(err);
-      })
+      });
   } else {
-    return result
+    return result;
   }
-}
+};
 
-module.exports.wrapper = wrapper
+module.exports.wrapper = wrapper;
