@@ -12,7 +12,7 @@ const wrapper = (event, context, callback) => {
 
   let result;
   try {
-    result = hello(event, context, callback);
+    result = hello(event, context, (err, res) => callback(err, res));
   } catch (err) {
     callback(err);
   }
