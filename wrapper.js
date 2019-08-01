@@ -6,41 +6,48 @@ const doSomething = () => {
 };
 
 const wrapper = (event, context, callback) => {
-  context.done = (err, res) => {
+  let didSomething = false;
+  const doSomethingOnce = () => {
+    if (didSomething) return;
     doSomething();
-    callback(err, res);
+    didSomething = true;
+  };
+
+  const { done, succeed, fail } = context;
+  context.done = (err, res) => {
+    doSomethingOnce();
+    done(err, res);
   };
   context.succeed = res => {
-    doSomething();
-    callback(null, res);
+    doSomethingOnce();
+    succeed(res);
   };
   context.fail = err => {
-    doSomething();
-    callback(err);
+    doSomethingOnce();
+    fail(err);
   };
 
   let result;
   try {
     result = hello(event, context, (err, res) => {
-      doSomething();
+      doSomethingOnce();
       callback(err, res);
     });
   } catch (err) {
-    doSomething();
+    doSomethingOnce();
     callback(err);
   }
   if (result && typeof result.then === "function") {
-    result
+    return result
       .then(realRes => {
-        doSomething();
-        callback(null, realRes);
+        doSomethingOnce();
       })
       .catch(err => {
-        callback(err);
-        doSomething();
+        doSomethingOnce();
+        throw err;
       });
   } else {
-    doSomething();
+    doSomethingOnce();
     return result;
   }
 };
